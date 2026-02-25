@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>前世での罪 診断書</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #05010f; min-height: 100vh; font-family: 'Noto Serif JP', serif; color: #e8d5b7; overflow-x: hidden; }
+    #root { min-height: 100vh; }
+
+```
+.bg {
+  position: fixed; inset: 0; overflow: hidden; z-index: 0;
+  background: radial-gradient(ellipse at 25% 20%, #1a0533 0%, #05010f 55%),
+              radial-gradient(ellipse at 80% 85%, #0d1a3a 0%, transparent 55%);
+}
+.particle {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle, #d4a017, transparent);
+  opacity: 0;
+}
+.pentagram {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px; opacity: 0.04;
+}
+.pentagram svg { width: 100%; height: 100%; animation: spin 80s linear infinite; }
+@keyframes spin { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+
+@keyframes floatP {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(1); }
+  30% { opacity: 0.5; }
+  60% { opacity: 0.2; }
+  100% { opacity: 0; transform: translateY(-50px) scale(0.5); }
+}
+
+.container {
+  position: relative; z-index: 1;
+  max-width: 680px; margin: 0 auto;
+  padding: 40px 20px 80px;
+  min-height: 100vh;
+}
+
+.header { text-align: center; margin-bottom: 48px; }
+.eyebrow {
+  font-size: 11px; letter-spacing: 6px; color: #b8860b;
+  text-transform: uppercase; margin-bottom: 14px; opacity: 0.8;
+}
+.title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(22px, 5vw, 38px); font-weight: 900;
+  background: linear-gradient(135deg, #d4a017 0%, #f5e06e 40%, #c8860a 80%, #f0c040 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; line-height: 1.3; margin-bottom: 18px;
+  filter: drop-shadow(0 0 28px #d4a01766);
+}
+.subtitle { font-size: 13px; color: #a09070; letter-spacing: 1.5px; line-height: 2; }
+.divider { display: flex; align-items: center; gap: 16px; margin: 32px 0; }
+.divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #b8860b55, transparent); }
+.divider-gem { color: #d4a017; font-size: 16px; filter: drop-shadow(0 0 8px #d4a017); }
+
+.intro-description {
+  background: linear-gradient(135deg, #0d0520, #150830);
+  border: 1px solid #3a2060; border-radius: 16px;
+  padding: 28px 32px; margin-bottom: 36px;
+  font-size: 14px; color: #a09070; line-height: 2.2; text-align: center;
+}
+.intro-description strong { color: #d4b880; }
+
+.btn {
+  display: block; margin: 0 auto;
+  padding: 18px 52px;
+  font-family: 'Cinzel Decorative', serif; font-size: 14px; font-weight: 700;
+  color: #05010f;
+  background: linear-gradient(135deg, #d4a017, #f5e06e, #c8860a);
+  border: none; border-radius: 50px; cursor: pointer;
+  letter-spacing: 2px; transition: all 0.3s ease;
+  box-shadow: 0 4px 30px #d4a01788; position: relative; overflow: hidden;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 40px #d4a017aa; }
+.btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 40%, #ffffff33);
+  pointer-events: none;
+}
+
+.progress-track {
+  width: 100%; height: 3px; background: #1a0060;
+  border-radius: 2px; margin-bottom: 36px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, #9b1dff, #d4a017);
+  border-radius: 2px; transition: width 0.5s ease;
+  box-shadow: 0 0 10px #9b1dff88;
+}
+.question-counter {
+  font-size: 11px; letter-spacing: 4px; color: #806040;
+  text-align: center; margin-bottom: 24px; text-transform: uppercase;
+}
+
+.question-wrap { transition: opacity 0.25s ease, transform 0.25s ease; }
+.question-wrap.out { opacity: 0; transform: translateX(20px); }
+.question-wrap.in { opacity: 1; transform: translateX(0); }
+
+.question-text {
+  font-size: clamp(18px, 4vw, 24px); font-weight: 600;
+  color: #e8d5b7; text-align: center; line-height: 1.7;
+  margin-bottom: 36px; letter-spacing: 0.5px;
+}
+.choices { display: flex; flex-direction: column; gap: 14px; }
+.choice-btn {
+  background: linear-gradient(135deg, #0d0520, #150830);
+  border: 1px solid #3a2060; border-radius: 14px;
+  padding: 20px 24px; cursor: pointer; text-align: left;
+  transition: all 0.25s ease; position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 16px;
+  font-family: 'Noto Serif JP', serif; width: 100%;
+}
+.choice-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 0% 50%, #9b1dff22, transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.choice-btn:hover { border-color: #7a40d0; transform: translateX(4px); box-shadow: 0 6px 24px #9b1dff33; }
+.choice-btn:hover::before { opacity: 1; }
+.choice-label {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid #3a2060; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #806040; flex-shrink: 0; transition: all 0.25s;
+}
+.choice-btn:hover .choice-label { border-color: #d4a017; color: #d4a017; background: #d4a01722; }
+.choice-text { font-size: 15px; color: #c8a878; line-height: 1.5; }
+
+.back-link {
+  display: block; margin-top: 28px; text-align: center;
+  font-size: 12px; color: #503820; letter-spacing: 2px;
+  cursor: pointer; transition: color 0.2s;
+  background: none; border: none; font-family: 'Noto Serif JP', serif;
+  width: 100%;
+}
+.back-link:hover { color: #806040; }
+
+.ritual {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 65vh; gap: 28px;
+}
+.ritual-orb {
+  width: 150px; height: 150px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #7a40d0, #1a0060, #000);
+  box-shadow: 0 0 60px #9b1dff88, 0 0 120px #9b1dff44, inset 0 0 40px #d4a01744;
+  animation: pulse 1.2s ease-in-out infinite;
+  display: flex; align-items: center; justify-content: center; font-size: 56px;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 60px #9b1dff88, 0 0 120px #9b1dff44; }
+  50% { transform: scale(1.08); box-shadow: 0 0 80px #9b1dffaa, 0 0 160px #9b1dff66; }
+}
+.ritual-text {
+  font-size: 17px; color: #c8a060; letter-spacing: 2px;
+  animation: flickerIn 0.4s ease; text-align: center;
+}
+@keyframes flickerIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ritual-bar { width: 220px; height: 3px; background: #1a0060; border-radius: 2px; overflow: hidden; }
+.ritual-bar-fill {
+  height: 100%; background: linear-gradient(90deg, #9b1dff, #d4a017);
+  border-radius: 2px; transition: width 0.75s ease; box-shadow: 0 0 12px #9b1dff;
+}
+
+.result-card {
+  background: linear-gradient(160deg, #0a0220, #12042e, #080118);
+  border: 1px solid #3a2060; border-radius: 24px;
+  padding: 48px 36px; text-align: center; position: relative; overflow: hidden;
+  opacity: 0; transform: scale(0.95) translateY(20px);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.result-card.revealed { opacity: 1; transform: scale(1) translateY(0); }
+.result-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% -10%, var(--ac) 0%, transparent 60%);
+  opacity: 0.07; pointer-events: none;
+}
+.result-era { font-size: 11px; letter-spacing: 4px; color: #806040; margin-bottom: 20px; text-transform: uppercase; }
+.result-icon {
+  font-size: 72px; margin-bottom: 16px; display: block;
+  filter: drop-shadow(0 0 20px var(--ac));
+  animation: iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.result-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(26px, 6vw, 42px); font-weight: 900;
+  color: var(--ac); margin-bottom: 8px;
+  filter: drop-shadow(0 0 20px var(--ac)); line-height: 1.2;
+}
+.glow-line {
+  width: 80px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ac), transparent);
+  margin: 20px auto; border-radius: 1px;
+}
+.result-summary { font-size: 16px; color: #c8a878; margin: 20px 0; line-height: 1.9; letter-spacing: 0.5px; }
+.result-detail {
+  background: #0d0230; border: 1px solid #2a1550; border-radius: 16px;
+  padding: 24px; margin: 24px 0;
+  font-size: 14px; color: #a09070; line-height: 2.1; text-align: left;
+}
+.sin-box { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+.sin-item {
+  background: linear-gradient(135deg, #0f0128, #180840);
+  border: 1px solid #3a2060; border-radius: 12px; padding: 16px; text-align: left;
+}
+.sin-label { font-size: 10px; color: #b8860b; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+.sin-text { font-size: 13px; color: #d4b880; line-height: 1.6; }
+.reset-btn {
+  margin-top: 32px; background: transparent; border: 1px solid #3a2060;
+  color: #806040; padding: 12px 32px; border-radius: 50px; cursor: pointer;
+  font-family: 'Noto Serif JP', serif; font-size: 13px; letter-spacing: 2px; transition: all 0.3s;
+}
+.reset-btn:hover { border-color: #d4a017; color: #d4a017; box-shadow: 0 0 20px #d4a01733; }
+
+@media (max-width: 500px) {
+  .sin-box { grid-template-columns: 1fr; }
+  .result-card { padding: 32px 18px; }
+  .intro-description { padding: 20px; }
+}
+```
+
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const questions = [
+      {
+        id: 1,
+        text: "待ち合わせの時間に遅れることが多い",
+        choices: ["ほぼ毎回遅れる", "たまに遅れる", "むしろ早く着く"],
+        scores: { late: [3, 1, 0] },
+      },
+      {
+        id: 2,
+        text: "ランチのメニューを決めるのに何分かかる？",
+        choices: ["10分以上悩む", "3〜5分は悩む", "秒で決める"],
+        scores: { indecisive: [3, 1, 0] },
+      },
+      {
+        id: 3,
+        text: "机やデスクの上の状態は？",
+        choices: ["カオス・何がどこにあるか不明", "まあまあ散らかってる", "いつも整理されてる"],
+        scores: { messy: [3, 1, 0] },
+      },
+      {
+        id: 4,
+        text: "LINEやメールの返信が",
+        choices: ["数日〜数週間後になることがある", "1日以内には返す", "即レス派"],
+        scores: { forgetful: [3, 1, 0] },
+      },
+      {
+        id: 5,
+        text: "食べ物をシェアするとき",
+        choices: ["一番うまそうなのは確保する", "普通に分ける", "相手に多めに譲る"],
+        scores: { greedy: [3, 1, 0] },
+      },
+      {
+        id: 6,
+        text: "自分を大きく見せるため、少し盛ることがある",
+        choices: ["わりとよくある", "たまにある", "ほぼしない"],
+        scores: { liar: [3, 1, 0] },
+      },
+      {
+        id: 7,
+        text: "友達の話で一番盛り上がるのは？",
+        choices: ["誰かの噂や秘密の話", "趣味や体験の話", "社会や仕事の話"],
+        scores: { gossip: [3, 1, 0] },
+      },
+      {
+        id: 8,
+        text: "自分が間違っていたと気づいたとき",
+        choices: ["認めたくない・言い訳してしまう", "しぶしぶ認める", "素直に謝れる"],
+        scores: { stubborn: [3, 1, 0] },
+      },
+      {
+        id: 9,
+        text: "友人の自慢話や成功を聞いたとき",
+        choices: ["少しモヤっとする", "複雑な気持ちにはなる", "素直におめでとうと思える"],
+        scores: { jealous: [3, 1, 0] },
+      },
+      {
+        id: 10,
+        text: "SNSに投稿するとき、送信前に何度確認する？",
+        choices: ["5回以上・何度も読み返す", "2〜3回は確認する", "サクッと投稿できる"],
+        scores: { overthink: [3, 1, 0] },
+      },
+    ];
+
+    const results = [
+      {
+        key: "dark_lord",
+        title: "暗黒魔王",
+        era: "中世ファンタジー世界・約800年前",
+        icon: "👑",
+        color: "#9b1dff",
+        summary: "あなたの前世は、七つの王国を恐怖で支配した暗黒魔王でした。",
+        detail: "毎朝9時に始まる「恐怖の謁見」は毎回30分遅れでスタート。配下の悪魔たちは廊下で震えながら待っていました。「滅びの呪文」を使おうとするたびに「えーっと…火にしようか、氷にしようか…」と悩み続け、結局村は無事に帰してしまうことも多々。部下から「優しい暗黒魔王」と陰で呼ばれていました。",
+        sin: "世界征服を後回しにし続けた大罪",
+        karma: "遅刻癖と優柔不断として現世に持ち越し中",
+        traits: ["late", "indecisive"],
+      },
+      {
+        key: "pirate",
+        title: "海賊大王",
+        era: "大航海時代・約400年前",
+        icon: "🏴‍☠️",
+        color: "#c8720a",
+        summary: "あなたの前世は、七つの海を荒らし回った伝説の海賊大王でした。",
+        detail: "「夜明けに出港！」と宣言しながら毎回昼過ぎに出発。略奪した財宝はどこに隠したか自分でも忘れ、宝の地図を3枚作って全部なくしました。船員の噂話が大好きで、「あの港の酒場のおかみさんがさ〜」と話しかけて嵐を見逃したことも。",
+        sin: "財宝よりも人の話を優先した罪",
+        karma: "忘れっぽさと噂好きとして現世に持ち越し中",
+        traits: ["gossip", "forgetful"],
+      },
+      {
+        key: "witch",
+        title: "呪いの魔女",
+        era: "ルネサンス期ヨーロッパ・約500年前",
+        icon: "🧙‍♀️",
+        color: "#2d8a4e",
+        summary: "あなたの前世は、森の奥に潜む恐怖の呪いの魔女でした。",
+        detail: "呪いをかけようとするたびに材料を切らし、「あっ、マンドラゴア買い忘れた」と森を往復。鍋の中はいつもカオスで、何の薬を作っていたか途中でわからなくなることも。村人を呪いに来た人が「この家、すごい魔力だ（散らかってるだけ）」と勘違いして帰っていきました。",
+        sin: "呪いを完成させなかった怠慢の罪",
+        karma: "部屋の散らかりと面倒くさがりとして現世に持ち越し中",
+        traits: ["messy", "lazy"],
+      },
+      {
+        key: "emperor",
+        title: "暴君皇帝",
+        era: "古代ローマ・約2000年前",
+        icon: "🏛️",
+        color: "#c41a1a",
+        summary: "あなたの前世は、民を苦しめた古代ローマの暴君皇帝でした。",
+        detail: "宴会で一番うまいものを全部自分で食べつくし、「これは皇帝の特権！」と言い張りました。元老院での議論では一度も折れたことがなく、負けそうになると「これは皇帝命令！」で強引に終わらせていました。配下への返信は平均3週間後。「皇帝はお忙しい」というのが言い訳でした。",
+        sin: "独占と頑固による民の疲弊",
+        karma: "食い意地と頑固さとして現世に持ち越し中",
+        traits: ["greedy", "stubborn"],
+      },
+      {
+        key: "spy",
+        title: "凄腕二重スパイ",
+        era: "近代ヨーロッパ・約100年前",
+        icon: "🕵️",
+        color: "#1a6b8a",
+        summary: "あなたの前世は、国家機密を売り歩いた凄腕二重スパイでした。",
+        detail: "どの国にも「自分こそ本当のエージェントだ」と見栄を張り続け、10カ国と同時に契約を結んでいました。「真実はこうだ」と嘘をついてもすぐバレ、「いや、あれは戦略的な嘘だ」と言い訳。待ち合わせには必ず遅刻し、「遅れたのは尾行を撒いていたから」と天才的な言い訳で切り抜けていました。",
+        sin: "虚栄心による国際秩序の混乱",
+        karma: "見栄っ張りと小さな嘘として現世に持ち越し中",
+        traits: ["liar", "jealous"],
+      },
+      {
+        key: "ninja",
+        title: "裏切り忍者",
+        era: "戦国時代・約450年前",
+        icon: "🥷",
+        color: "#4a4a9a",
+        summary: "あなたの前世は、主君を次々と変えた伝説の裏切り忍者でした。",
+        detail: "「今度こそ忠義を尽くす」と思うたびに隣の藩の条件が気になり始め、生涯で17人の主君に仕えました。任務の途中で「これ本当に正しい選択なのか…」と屋根の上で悩みすぎて夜明けを迎えたことも多数。送ったはずの密書が下書きのまま残っていたことも。",
+        sin: "決断できずに歴史を変え損ねた罪",
+        karma: "優柔不断と考えすぎとして現世に持ち越し中",
+        traits: ["indecisive", "overthink"],
+      },
+    ];
+
+    function calcResult(answers) {
+      const scores = {};
+      questions.forEach((q, i) => {
+        const idx = answers[i];
+        if (idx === undefined) return;
+        Object.entries(q.scores).forEach(([trait, vals]) => {
+          scores[trait] = (scores[trait] || 0) + (vals[idx] ?? 0);
+        });
+      });
+      let best = results[0];
+      let bestScore = -1;
+      results.forEach((r) => {
+        const s = r.traits.reduce((sum, t) => sum + (scores[t] || 0), 0);
+        if (s > bestScore) { bestScore = s; best = r; }
+      });
+      return best;
+    }
+
+    function App() {
+      const [phase, setPhase] = useState("intro");
+      const [current, setCurrent] = useState(0);
+      const [answers, setAnswers] = useState({});
+      const [result, setResult] = useState(null);
+      const [ritualStep, setRitualStep] = useState(0);
+      const [particles, setParticles] = useState([]);
+      const [revealed, setRevealed] = useState(false);
+      const [animIn, setAnimIn] = useState(true);
+
+      useEffect(() => {
+        setParticles(Array.from({ length: 20 }, (_, i) => ({
+          id: i,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size: Math.random() * 3 + 1,
+          delay: Math.random() * 4,
+          duration: Math.random() * 6 + 4,
+        })));
+      }, []);
+
+      const selectAnswer = (idx) => {
+        const newAnswers = { ...answers, [current]: idx };
+        setAnswers(newAnswers);
+        if (current < questions.length - 1) {
+          setAnimIn(false);
+          setTimeout(() => { setCurrent(current + 1); setAnimIn(true); }, 250);
+        } else {
+          const r = calcResult(newAnswers);
+          setResult(r);
+          setPhase("ritual");
+          setRitualStep(0);
+          let step = 0;
+          const iv = setInterval(() => {
+            step++;
+            setRitualStep(step);
+            if (step >= 4) {
+              clearInterval(iv);
+              setTimeout(() => {
+                setPhase("result");
+                setTimeout(() => setRevealed(true), 300);
+              }, 600);
+            }
+          }, 750);
+        }
+      };
+
+      const goBack = () => {
+        if (current === 0) return;
+        setAnimIn(false);
+        setTimeout(() => { setCurrent(current - 1); setAnimIn(true); }, 250);
+      };
+
+      const reset = () => {
+        setPhase("intro"); setCurrent(0); setAnswers({});
+        setResult(null); setRitualStep(0); setRevealed(false); setAnimIn(true);
+      };
+
+      const ritualTexts = [
+        "🔮 過去の業を読み解いています…",
+        "📜 アカシックレコードを検索中…",
+        "⚡ 前世の記憶が浮かび上がる…",
+        "💀 あなたの罪が明らかになる…",
+      ];
+
+      const progress = (current / questions.length) * 100;
+
+      return (
+        <>
+          <div className="bg">
+            {particles.map((p) => (
+              <div key={p.id} className="particle" style={{
+                left: `${p.x}%`, top: `${p.y}%`,
+                width: p.size, height: p.size,
+                animation: `floatP ${p.duration}s ${p.delay}s ease-in-out infinite`,
+              }} />
+            ))}
+            <div className="pentagram">
+              <svg viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="95" stroke="#d4a017" strokeWidth="0.5" />
+                <circle cx="100" cy="100" r="75" stroke="#d4a017" strokeWidth="0.5" />
+                <polygon points="100,10 122,78 194,78 136,122 158,190 100,146 42,190 64,122 6,78 78,78"
+                  stroke="#d4a017" strokeWidth="0.5" fill="none" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="container">
+            {phase === "intro" && (
+              <>
+                <div className="header">
+                  <p className="eyebrow">✦ Akashic Oracle ✦</p>
+                  <h1 className="title">前世での罪<br />診断書</h1>
+                  <p className="subtitle">現世に残るあなたの欠点は、<br />前世で犯した罪の業（カルマ）である。</p>
+                </div>
+                <div className="divider">
+                  <div className="divider-line" /><div className="divider-gem">◆</div><div className="divider-line" />
+                </div>
+                <div className="intro-description">
+                  <strong>10の問い</strong>に答えると、<br />
+                  あなたの前世での所業と<br />
+                  犯した大罪が明かされる。<br /><br />
+                  <span style={{ fontSize: "12px", color: "#604030" }}>※ 直感でお答えください。考えすぎは禁物です。</span>
+                </div>
+                <button className="btn" onClick={() => setPhase("quiz")}>診断を始める</button>
+              </>
+            )}
+
+            {phase === "quiz" && (
+              <>
+                <div className="progress-track">
+                  <div className="progress-fill" style={{ width: `${progress}%` }} />
+                </div>
+                <p className="question-counter">Question {current + 1} / {questions.length}</p>
+                <div className={`question-wrap ${animIn ? "in" : "out"}`}>
+                  <p className="question-text">{questions[current].text}</p>
+                  <div className="choices">
+                    {questions[current].choices.map((c, i) => (
+                      <button key={i} className="choice-btn" onClick={() => selectAnswer(i)}>
+                        <span className="choice-label">{["A", "B", "C"][i]}</span>
+                        <span className="choice-text">{c}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {current > 0 && (
+                  <button className="back-link" onClick={goBack}>← 前の問いに戻る</button>
+                )}
+              </>
+            )}
+
+            {phase === "ritual" && (
+              <div className="ritual">
+                <div className="ritual-orb">🔮</div>
+                <p className="ritual-text" key={ritualStep}>
+                  {ritualTexts[Math.min(ritualStep, ritualTexts.length - 1)]}
+                </p>
+                <div className="ritual-bar">
+                  <div className="ritual-bar-fill" style={{ width: `${((ritualStep + 1) / 5) * 100}%` }} />
+                </div>
+              </div>
+            )}
+
+            {phase === "result" && result && (
+              <>
+                <div className="header" style={{ marginBottom: 32 }}>
+                  <p className="eyebrow">✦ 審判 ✦</p>
+                  <h1 className="title">あなたの前世が<br />判明した</h1>
+                </div>
+                <div
+                  className={`result-card${revealed ? " revealed" : ""}`}
+                  style={{ "--ac": result.color }}
+                >
+                  <p className="result-era">📜 {result.era}</p>
+                  <span className="result-icon">{result.icon}</span>
+                  <h2 className="result-title">{result.title}</h2>
+                  <div className="glow-line" />
+                  <p className="result-summary">{result.summary}</p>
+                  <div className="result-detail">
+                    <strong style={{ color: "#d4b880", display: "block", marginBottom: 12 }}>─ 前世での所業 ─</strong>
+                    {result.detail}
+                  </div>
+                  <div className="sin-box">
+                    <div className="sin-item">
+                      <p className="sin-label">⚡ 前世の大罪</p>
+                      <p className="sin-text">{result.sin}</p>
+                    </div>
+                    <div className="sin-item">
+                      <p className="sin-label">♾️ 現世への影響</p>
+                      <p className="sin-text">{result.karma}</p>
+                    </div>
+                  </div>
+                  <button className="reset-btn" onClick={reset}>↺ もう一度診断する</button>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+
+</body>
+</html>
